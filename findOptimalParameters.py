@@ -42,19 +42,22 @@ while True:
     bboxesList.append(BoxesInFrame)
 file.close()
 frameDir=Path.joinpath(dir,"frames")
+frames=[]
+for i in range(int(len(FrameNames))):
+    frames.append(cv2.imread(str(Path.joinpath(frameDir,FrameNames[i]))))
 def fun(x):
     answers=[-1]
     frame2=cv2.imread(str(Path.joinpath(frameDir,FrameNames[0])),cv2.IMREAD_COLOR)
     for i in range(int(len(FrameNames)-1)):
-        frame1=frame2
-        frame2=cv2.imread(str(Path.joinpath(frameDir,FrameNames[i+1])))
-        returnString=procces(frame1,frame2,bboxesList[i],bboxesList[i+1],x[0],x[1],x[2],x[3])
+        frame1=frames[i]
+        frame2=frames[i+1]
+        returnString=procces(frame1,frame2,bboxesList[i],bboxesList[i+1],x[0],x[1],x[2],x[3],x[4])
         answers.extend(returnString)
     return 1-accuracy_score(gts,answers)
-x0=[1,1,1,1]
-bnds=((0.05,1),(0.05,1),(0.05,1),(0.05,1))
-#res=minimize(fun,x0,method=)
-res=dual_annealing(fun,bnds)
+x0=[0.5,1,1,1,1]
+bnds=((0.05,1),(0.05,10),(0.05,10),(0.05,10),(0.05,10))
+#res=minimize(fun,x0, bounds=bnds)
+res=dual_annealing(fun,bnds,maxiter=100)
 print(res)
 
 

@@ -34,8 +34,10 @@ while True:
         bbox=file.readline()[:-1]
         bbox=bbox.split(' ')
         gt,x,y,w,h=bbox
+        
         gts.append(int(gt))
         bbox=[x,y,w,h]
+        
         bbox=[float(i) for i in bbox]
         BoxesInFrame.append(bbox)
     bboxesList.append(BoxesInFrame)
@@ -44,14 +46,15 @@ frameDir=Path.joinpath(dir,"frames")
 frame2=cv2.imread(str(Path.joinpath(frameDir,FrameNames[0])),cv2.IMREAD_COLOR)
 answers=[-1]
 for i in range(int(len(FrameNames)-1)):
-    frame1=frame2
+    frame1=frame2.copy()
     frame2=cv2.imread(str(Path.joinpath(frameDir,FrameNames[i+1])))
-    returnString=procces(frame1,frame2,bboxesList[i],bboxesList[i+1],0.7,0.3,0.2,0.1)#histWeight,TMWeight,IoUWeight
+    #print(bboxesList[i+1])
+    returnString=procces(frame1,frame2,bboxesList[i],bboxesList[i+1],0.4,1.0,0.0,0.0,0.0)#histWeight,TMWeight,IoUWeight
     # print(i)
     # print(bboxesList[i])
     # print(bboxesList[i+1])
     # print(returnString)
     answers.extend(returnString)
-# print(gts)
+#print(gts)
 # print(answers)
 print(accuracy_score(gts,answers))
