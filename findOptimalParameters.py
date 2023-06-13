@@ -51,7 +51,7 @@ def fun(x):
     for i in range(int(len(FrameNames)-1)):
         frame1=frames[i]
         frame2=frames[i+1]
-        returnString=procces(frame1,frame2,bboxesList[i],bboxesList[i+1],x[0],x[1],x[2],x[3],x[4])
+        returnString=procces(frame1,frame2,bboxesList[i],bboxesList[i+1],x[0],x[1],x[2],x[3],x[4],x[5])
         answers.extend(returnString)
     return 1-accuracy_score(gts,answers)
 x0=[0.5,1,1,1,1]

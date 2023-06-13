@@ -1,5 +1,4 @@
 import argparse
-import json
 from pathlib import Path
 import cv2
 from procces import procces
@@ -49,7 +48,8 @@ for i in range(int(len(FrameNames)-1)):
     frame1=frame2.copy()
     frame2=cv2.imread(str(Path.joinpath(frameDir,FrameNames[i+1])))
     #print(bboxesList[i+1])
-    returnString=procces(frame1,frame2,bboxesList[i],bboxesList[i+1],0.4,1.0,0.0,0.0,0.0)#histWeight,TMWeight,IoUWeight
+    returnString=procces(frame1,frame2,bboxesList[i],bboxesList[i+1],newTH=0.5,histWeight=1.08,TMWeight=1.3,
+                         IoUWeight=0.05,SizeWeight=0.65,SSIMWeight=1.16)
     # print(i)
     # print(bboxesList[i])
     # print(bboxesList[i+1])

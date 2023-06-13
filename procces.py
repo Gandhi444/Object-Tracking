@@ -1,7 +1,8 @@
 import cv2 as cv,cv2
 import numpy as np
 from scipy.optimize import linear_sum_assignment
-def procces(frame1:cv2.Mat,frame2:cv2.Mat,bboxs1,bboxs2,newTH,histWeight,TMWeight,IoUWeight,SizeWeight):
+from skimage.metrics import structural_similarity
+def procces(frame1:cv2.Mat,frame2:cv2.Mat,bboxs1,bboxs2,newTH,histWeight,TMWeight,IoUWeight,SizeWeight,SSIMWeight):
     m=len(bboxs1)
     #print(bboxs1)
     n=len(bboxs2)
@@ -78,7 +79,6 @@ def procces(frame1:cv2.Mat,frame2:cv2.Mat,bboxs1,bboxs2,newTH,histWeight,TMWeigh
             # cv2.imshow("in2",input2)
             # cv.waitKey(0)
             TMMatrix[i,j]=res[0][0]
-    #print(TMMatrix)
     HistMatrix=np.zeros((m,n))
     for i in range(m):
         #print("################################")
@@ -110,9 +110,24 @@ def procces(frame1:cv2.Mat,frame2:cv2.Mat,bboxs1,bboxs2,newTH,histWeight,TMWeigh
             ratio=min(area1,area2)/max(area1,area2)
             #print(ratio)
             SizeMatrix[i][j]=ratio
-    #print(TMMatrix)
-    SimilarityMatrix=HistMatrix*histWeight+IoUMatrix*IoUWeight+TMMatrix*TMWeight+SizeMatrix*SizeWeight
-    WeightSum=TMWeight+IoUWeight+histWeight+SizeWeight
+    SSIMMatrix=np.zeros((m,n))
+    for i in range(m):
+        for j in range(n):
+            shape1=cutOutBoxes1[i].shape
+            shape2=cutOutBoxes2[j].shape
+            width=min(shape1[1],shape2[1])
+            height=min(shape1[0],shape2[0])
+            input1 = cv2.resize(cutOutBoxes1[i], (width,height), interpolation = cv2.INTER_AREA)
+            input2 = cv2.resize(cutOutBoxes2[j], (width,height), interpolation = cv2.INTER_AREA)
+            input1=cv2.cvtColor(input1,cv.COLOR_BGR2GRAY)
+            input2=cv2.cvtColor(input2,cv.COLOR_BGR2GRAY)
+            score = structural_similarity(input1, input2)
+            #print(score)
+            SSIMMatrix[i][j]=score
+
+
+    SimilarityMatrix=HistMatrix*histWeight+IoUMatrix*IoUWeight+TMMatrix*TMWeight+SizeMatrix*SizeWeight+SSIMMatrix*SSIMWeight
+    WeightSum=TMWeight+IoUWeight+histWeight+SizeWeight+SSIMWeight
     SimilarityMatrix=SimilarityMatrix/WeightSum
     #print('dwa',SimilarityMatrix)
     graph[:m,:n]=SimilarityMatrix
@@ -132,4 +147,6 @@ def procces(frame1:cv2.Mat,frame2:cv2.Mat,bboxs1,bboxs2,newTH,histWeight,TMWeigh
     out=[]
     for pair in sorted_pairs:
         out.append(pair[1])
+    out=np.array(out)
+    out[out>m-1]=-1
     return out
