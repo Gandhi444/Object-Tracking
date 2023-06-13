@@ -1,5 +1,4 @@
 import argparse
-import json
 from pathlib import Path
 import cv2
 from procces import procces
@@ -58,7 +57,7 @@ x0=[0.5,1,1,1,1]
 bnds=((0.05,1),(0.05,10),(0.05,10),(0.05,10),(0.05,10))
 #res=minimize(fun,x0, bounds=bnds)
 res=dual_annealing(fun,bnds,maxiter=100)
-print(res)
+#print(res)
 
 
 

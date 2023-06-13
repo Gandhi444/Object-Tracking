@@ -2,17 +2,15 @@ import argparse
 from pathlib import Path
 import cv2
 from procces import procces
-from sklearn.metrics import accuracy_score
+
 parser = argparse.ArgumentParser()
 parser.add_argument('dir', type=str)
 args = parser.parse_args()
 dir = Path(args.dir)
 
-#bboxes=Path.joinpath(dir,'bboxes.txt')
-bboxes=Path.joinpath(dir,'bboxes_gt.txt')
+bboxes=Path.joinpath(dir,'bboxes.txt')
 
 file = open(bboxes, 'r')
-count = 0
 FrameNames=[]
 bboxesList=[]
 gts=[]
@@ -24,37 +22,26 @@ while True:
     FrameNames.append(str(FrameName)[:-1])
     N=file.readline()
     BoxesInFrame=[]
-    # for i in range(int(N)):
-    #     bbox=file.readline()[:-1]
-    #     bbox=bbox.split(' ')
-    #     bbox=[float(i) for i in bbox]
-    #     BoxesInFrame.append(bbox)
     for i in range(int(N)):
         bbox=file.readline()[:-1]
         bbox=bbox.split(' ')
-        gt,x,y,w,h=bbox
-        
-        gts.append(int(gt))
+        x,y,w,h=bbox
         bbox=[x,y,w,h]
-        
         bbox=[float(i) for i in bbox]
         BoxesInFrame.append(bbox)
     bboxesList.append(BoxesInFrame)
 file.close()
 frameDir=Path.joinpath(dir,"frames")
 frame2=cv2.imread(str(Path.joinpath(frameDir,FrameNames[0])),cv2.IMREAD_COLOR)
-answers=[-1]
+answers=[[-1]*len(bboxesList[0])]
 for i in range(int(len(FrameNames)-1)):
     frame1=frame2.copy()
     frame2=cv2.imread(str(Path.joinpath(frameDir,FrameNames[i+1])))
-    #print(bboxesList[i+1])
     returnString=procces(frame1,frame2,bboxesList[i],bboxesList[i+1],newTH=0.5,histWeight=1.08,TMWeight=1.3,
                          IoUWeight=0.05,SizeWeight=0.65,SSIMWeight=1.16)
-    # print(i)
-    # print(bboxesList[i])
-    # print(bboxesList[i+1])
-    # print(returnString)
-    answers.extend(returnString)
-#print(gts)
-# print(answers)
-print(accuracy_score(gts,answers))
+    answers.append(returnString)
+for frame_answer in answers:
+    string=""
+    for number in frame_answer:
+        string=string + " " + str(number)
+    print(string)
