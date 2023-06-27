@@ -1,9 +1,9 @@
-# SIwRProject
-## Użyta metoda
-Do śledzenia bazuje na Bipartite graph który jest optymalizowany przy pomocy funkcji linear_sum_assignment() z biblioteki scipy.
-Macierz opisująca graf jest budowana poprzez średnią ważoną następujących wskaźników podobieństwa obrazów:
+# Object Tracking
+## Used method
+Tracking based on Biparite graph optimised with linear_sum_assignment() function from scipy.
+Graph is build by calculating weighted average of following image similarity metrics:
 1. Structural Similarity Index Measure (SSIM)
 2. Template Matching
-3. Stosunek pola bounding boxów
-4. Porównania Histogramów
+3. Ratio of Bounding Box Area
+4. Histogram Comparison
 5. Intersection Over Union
